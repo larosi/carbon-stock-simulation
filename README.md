@@ -2,92 +2,71 @@
 
 Generación de datos LiDAR y carbon stock a partir de bosques 3D simulados
 
-## Getting started
+## Crear catalogo de árboles
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Primero hay que conseguir los assets de árboles que se usarán para crear el bosque, por el momento estamos usando los modelos del [Kit lowpoly shapespark](https://sketchfab.com/3d-models/shapespark-low-poly-plants-kit-de9e79fc07b748d1a6ac055b49ee5c67) que contiene arboles de distinto tipo y tamaño, estos modelos se guardaron en el archivo **data/main.blend**. Para cada modelo se anota manualmente su nombre, tipo y altura en metros en el archivo **data/catalog.csv**
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+|name|type|height|
+|---|----|------|
+|Flowers-02|low|0.890973|
+|Flowers-04|low|0.914986|
+|Tree-02-2|mid|7.9601|
 
-## Add your files
+![Tree Examples](./docs/tree_measure_h.png?raw=true "Tree Examples")
 
-- [ ] [Create](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## Crear lista de rasters
 
+La idea es generar un bosque 3D a partir de imagenes de CHM reales, en el archivo **data/dataset_info.csv** contiene los nombres sin extension y dimensiones de los rasters, este archivo se puede generar con el script **src/prepare/make_dataset_info.py**
+
+```bash
+python src/prepare/make_dataset_info.py
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/odd-industries/ia_experimental/lidar/carbon-stock-simulation.git
-git branch -M master
-git push -uf origin master
+
+## Generar seed de árboles
+
+El script **src/prepare/forest-seed.py** realiza una individualización de los árboles detectando los máximos locales dentro de una ventana móvil en las imagenes de CHM, se almacena cada punto detectado, su altura y su diametro (estimado con funciones alométricas) en un .csv con el mismo nombre del ráster, también se guardan .html con las detecciones de cada imagen en **data/plots/**
+```bash
+python src/prepare/forest-seed.py
 ```
 
-## Integrate with your tools
+![Detected Trees](./docs/chm_peaks.png?raw=true "Detected Trees")
 
-- [ ] [Set up project integrations](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://gitlab.com/odd-industries/ia_experimental/lidar/carbon-stock-simulation/-/settings/integrations)
+## CSV2JSON
 
-## Collaborate with your team
+Por el momento no he logrado instalar librerias extras al python de blender, por lo que no podemos usar pandas para leer los .csv generados, por esta razón se deben transformar archivos .json, estos se crean en la carpeta **/data/json/**
 
-- [ ] [Invite team members and collaborators](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+```bash
+python src/prepare/csv_to_json.py
+```
 
-## Test and Deploy
+## Generar Bosque 3D
+Abrir el archivo **data/main.blend** en blender y ejecutar el script **src/generate/blender-generate-dataset.py** esto generará un .obj y .mtl en **data/export/obj/**
 
-Use the built-in continuous integration in GitLab.
+![Blender Forest 3D](./docs/blender_forest.jpg?raw=true "Blender Forest 3D")
 
-- [ ] [Get started with GitLab CI/CD](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://gitlab.com/-/experiment/new_project_readme_content:64d0755bff4e2aba2d47d9fefe8b6d72?https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## Paths .mtl a relativos
+Los path a los archivos de texturas estan definidos en los archivos .mtl de cada modelo, estos por defecto estan en como path absoluto, el script **src/postprocessing/fix_mtl.py** modifica los path de los .mtl para dejarlos en formato relativo
 
-***
+```bash
+python src/postprocessing/fix_mtl.py
+```
 
-# Editing this README
+## OBJ2LAS
+El software opensource [CloudCompare](https://www.cloudcompare.org/) se puede [ejecutar por linea de comandos](https://www.cloudcompare.org/doc/wiki/index.php?title=Command_line_mode) si su ejecutable se agrega a las variables de entorno, el script **src/postprocessing/cloudcompare_obj2las.py** transforma cada .obj en un archivo .las usando CloudCompare por defecto con una densidad de 10 pts por metro cuadrado
+```bash
+python src/postprocessing/cloudcompare_obj2las.py
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!).  Thank you to [makeareadme.com](https://www.makeareadme.com) for this template.
+## LAS2CHM
+El script **src/postprocessing/lidar2chm_laspy.py** genera los raster CHM en formato .tif a partir de los archivos .las usando laspy por defecto a una resolución de 0.12 mts
+```bash
+python src/postprocessing/lidar2chm_laspy.py
+```
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## Agregar información geoespacial
+El script **src/postprocessing/lidar2chm_laspy.py** copia la información geoespacial de los raster originales, y también le aplica un Crop y resize a los raster generados para que queden del mismo tamaño que los originales, los rasters generados se guardan en **data/export/chm_fixed**
+```bash
+python src/postprocessing/chm_clone_geometadata.py
+```
 
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
-
+![Fake Oncol CHM](./docs/oncol_gen_blender.png?raw=true "Fake Oncol CHM")
