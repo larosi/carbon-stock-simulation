@@ -6,7 +6,9 @@ Created on Wed Jan 12 17:41:08 2022
 """
 
 import os
+import pathlib
 from tqdm import tqdm
+
 
 def create_flag(output_folder, filename):
     flag_path = os.path.join(output_folder, filename + '.txt')
@@ -16,7 +18,15 @@ def create_flag(output_folder, filename):
     f.close()
     return False
 
-input_folder = r'C:\Users\Mico\Desktop\gitlab\carbon-stock-simulation\data\export\obj'
+
+THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
+THIS_PROJECT = str(pathlib.Path(THIS_PATH.split('src')[0]))
+export_folder = os.path.join(THIS_PROJECT, 'data', 'export')
+input_folder = os.path.join(export_folder, 'obj')
+output_folder = os.path.join(export_folder, 'las')
+os.makedirs(output_folder, exist_ok=True)
+
+mesh_density = 10
 
 input_filenames = []
 for fn in os.listdir(input_folder):
@@ -25,15 +35,13 @@ for fn in os.listdir(input_folder):
 
 for input_filename in tqdm(input_filenames):
     input_path = os.path.join(input_folder, input_filename)
-    
-    output_folder = r'C:\Users\Mico\Desktop\gitlab\carbon-stock-simulation\data\export\las'
+
     base_filename = input_filename.replace('.obj', '')
     output_filename = base_filename + '.las'
     output_path = os.path.join(output_folder, output_filename)
-    
+
     if create_flag(output_folder, base_filename):
         pass
     else:
-        cmd_str = f'cloudcompare -SILENT -O "{input_path}" -AUTO_SAVE OFF -SAMPLE_MESH DENSITY 10 -C_EXPORT_FMT LAS -SAVE_CLOUDS FILE "{output_path}"'
-        #print(cmd_str)
+        cmd_str = f'cloudcompare -SILENT -O "{input_path}" -AUTO_SAVE OFF -SAMPLE_MESH DENSITY {mesh_density} -C_EXPORT_FMT LAS -SAVE_CLOUDS FILE "{output_path}"'
         os.system('cmd /k "{}"'.format(cmd_str))

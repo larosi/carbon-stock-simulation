@@ -8,7 +8,7 @@ Created on Thu Mar 24 09:48:59 2022
 import bpy
 import json
 import os
-
+import pathlib
 
 def read_json(json_path):
     f = open(json_path)
@@ -35,7 +35,11 @@ def export_selected_obj(output_folder, filename):
 
 
 # FIXME: change for your PC path
-THIS_PROJECT = r'C:\Users\Mico\Desktop\gitlab\carbon-stock-simulation'
+PROJECT_NAME = 'carbon-stock-simulation'
+THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
+THIS_PROJECT = str(pathlib.Path(THIS_PATH.split(PROJECT_NAME)[0]))
+THIS_PROJECT = os.path.join(THIS_PROJECT, PROJECT_NAME)
+
 DATA_DIR = os.path.join(THIS_PROJECT, 'data', 'json')
 OUTPUT_DIR = os.path.join(THIS_PROJECT, 'data', 'export', 'trees_obj')
 os.makedirs(OUTPUT_DIR, exist_ok=True)

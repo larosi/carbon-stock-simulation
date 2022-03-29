@@ -13,6 +13,7 @@ from tqdm import tqdm
 from skimage.transform import rescale
 import plotly.express as px
 import pandas as pd
+import pathlib
 
 
 # https://www.conaf.cl/wp-content/files_mf/1381956486Informeroble.pdf
@@ -29,11 +30,28 @@ def find_peaks(image, min_distance=14):
     return coordinates
 
 
-chm_folder = r'..\..\..\..\carbon-stock\data\raw\laz\chm'
-chm_filenames = os.listdir(chm_folder)
+# directories relatives to project root path
+THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
+PROJECT_ROOT = str(pathlib.Path(THIS_PATH.split('src')[0]))
+DATA_DIR = os.path.join(PROJECT_ROOT, 'data')
 
-for chm_filename in tqdm(chm_filenames):
+# inputs
+chm_folder = os.path.join(PROJECT_ROOT, r'..\carbon-stock\data\raw\laz\chm')
+dataset_info_path = os.path.join(DATA_DIR, 'dataset_info.csv')
 
+# outputs
+SEEDS_DIR = os.path.join(DATA_DIR, 'seeds')
+PLOTS_DIR = os.path.join(DATA_DIR, 'plots')
+
+os.makedirs(SEEDS_DIR, exist_ok=True)
+os.makedirs(PLOTS_DIR, exist_ok=True)
+
+# get raster filenames
+df_info = pd.read_csv(dataset_info_path)
+chm_filenames = df_info['filename'].values
+
+for chm_base_filename in tqdm(chm_filenames):
+    chm_filename = chm_base_filename + '.tif'
     chm_path = os.path.join(chm_folder, chm_filename)
 
     chm = io.imread(chm_path, as_gray=True)
@@ -71,12 +89,10 @@ for chm_filename in tqdm(chm_filenames):
     df['x'] = pd.Series(seed_coords[:, 1])
     df['y'] = pd.Series(seed_coords[:, 0])
 
-    plot_filename = chm_filename.replace('.tif', '.csv')
-    output_path = os.path.join('data', 'seeds', plot_filename)
+    output_path = os.path.join(SEEDS_DIR, chm_base_filename + '.csv')
     df.to_csv(output_path, index=False)
 
-    output_html_path = os.path.join('data', 'plots',
-                                    chm_filename.replace('.tif', '.html'))
+    output_html_path = os.path.join(PLOTS_DIR, chm_base_filename + '.html')
     scale_factor = 8
     fig = px.imshow(rescale(image, 1/scale_factor))
     fig.add_scatter(x=seed_coords[:, 1]/scale_factor,
