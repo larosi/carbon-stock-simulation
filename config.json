@@ -1,30 +1,43 @@
 {
 "input_chm_dir": "path a los archivos chm reales de un proyecto externo como Oncol",
 "input_chm_dir": "../carbon-stock/data/raw/laz/chm",
-"export_dir": "carpeta donde se guardaran los archivos generados por los scripts",
-"export_dir": "data/export",
+
 "resolution" : "resolución del chm generado por LiDAR en metros",
 "resolution" : 0.12,
-"tree_mask_resolution" : "resolución de la máscara generada para cada árbol en metros",
-"tree_mask_resolution" : 0.01,
-"data_dir" : "directorio con los datos del repositorio",
-"data_dir" : "data",
-"json_dir" : "dataframes .csv en formato .json para compatibilidad con blender",
-"json_dir" : "data/json",
-"seeds_dir" : "directorio donde se guardan los dataframes con las detecciones de arboles",
-"seeds_dir" : "data/seeds",
-"catalog" : "dataframe con los nombres de los arboles 3D, su clasificación y altura en metros",
-"catalog" : "data/catalog.csv",
-"dataset_info" : "dataframe con los filenames de chm y las dimensiones de cada raster",
-"dataset_info" : "data/dataset_info.csv",
-"csvs_filenames": "nombres de los archivos .csv que seran transformados a json",
-"csvs_filenames": ["catalog.csv", "dataset_info.csv"],
+
 "mesh_density" : "densidad de la nube de puntos generada a partir de un modelo 3D",
 "mesh_density" : 10,
-"color_th" : "umbral para seleccionar solo colores claros de la nube de puntos que corresponden a hojas",
-"color_th" : 0.25,
+
 "sotobosque_th" : "umbral para clasificar la vegetacion como sotobosque en metros",
 "sotobosque_th" : 2.5,
+
 "hmax" : "altura maxima posible de un arbol en metros",
 "hmax" : 45,
+
+"tree_mask_resolution" : "resolución de la máscara generada para cada árbol en metros",
+"tree_mask_resolution" : 0.01,
+
+"color_th" : "umbral para seleccionar solo colores claros de la nube de puntos que corresponden a hojas",
+"color_th" : 0.25,
+
+"export_dir": "carpeta donde se guardaran los archivos generados por los scripts",
+"export_dir": "data/export",
+
+"data_dir" : "directorio con los datos del repositorio",
+"data_dir" : "data",
+
+"json_dir" : "dataframes .csv en formato .json para compatibilidad con blender",
+"json_dir" : "data/json",
+
+"seeds_dir" : "directorio donde se guardan los dataframes con las detecciones de arboles",
+"seeds_dir" : "data/seeds",
+
+"csvs_filenames": "nombres de los archivos .csv que seran transformados a json",
+"csvs_filenames": ["catalog.csv", "dataset_info.csv"],
+
+"catalog" : "dataframe con los nombres de los arboles 3D, su clasificación y altura en metros",
+"catalog" : "data/catalog.csv",
+
+"dataset_info" : "dataframe con los filenames de chm y las dimensiones de cada raster",
+"dataset_info" : "data/dataset_info.csv"
 }

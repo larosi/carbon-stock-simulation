@@ -25,7 +25,7 @@ def read_json(json_path):
 
 
 THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
-THIS_PROJECT  = str(pathlib.Path(THIS_PATH.split('src')[0]))
+THIS_PROJECT = str(pathlib.Path(THIS_PATH.split('src')[0]))
 config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
 DATA_DIR = os.path.join(THIS_PROJECT, config['data_dir'])
 EXPORT_DIR = os.path.join(THIS_PROJECT, config['export_dir'])
