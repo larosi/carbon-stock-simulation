@@ -8,6 +8,7 @@ Created on Wed Jan 12 17:41:08 2022
 import os
 import pathlib
 from tqdm import tqdm
+import json
 
 
 def create_flag(output_folder, filename):
@@ -19,14 +20,23 @@ def create_flag(output_folder, filename):
     return False
 
 
+def read_json(json_path):
+    f = open(json_path)
+    data = json.load(f)
+    f.close()
+    return data
+
+
+# TODO: use argparse for paths and mesh_density
 THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
 THIS_PROJECT = str(pathlib.Path(THIS_PATH.split('src')[0]))
-export_folder = os.path.join(THIS_PROJECT, 'data', 'export')
+config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
+export_folder = os.path.join(THIS_PROJECT, config['export_dir'])
 input_folder = os.path.join(export_folder, 'obj')
 output_folder = os.path.join(export_folder, 'las')
 os.makedirs(output_folder, exist_ok=True)
 
-mesh_density = 10
+mesh_density = config['mesh_density']
 
 input_filenames = []
 for fn in os.listdir(input_folder):

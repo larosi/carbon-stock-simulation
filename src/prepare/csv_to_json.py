@@ -8,6 +8,14 @@ Created on Mon Jan 10 11:07:06 2022
 import pandas as pd
 import os
 import pathlib
+import json
+
+
+def read_json(json_path):
+    f = open(json_path)
+    data = json.load(f)
+    f.close()
+    return data
 
 
 def csvs_to_json(filenames, input_dir, output_dir):
@@ -21,15 +29,16 @@ def csvs_to_json(filenames, input_dir, output_dir):
 
 # directories relatives to project root path
 THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
-PROJECT_ROOT = str(pathlib.Path(THIS_PATH.split('src')[0]))
-DATA_DIR = os.path.join(PROJECT_ROOT, 'data')
+THIS_PROJECT = str(pathlib.Path(THIS_PATH.split('src')[0]))
+config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
+DATA_DIR = os.path.join(THIS_PROJECT, config['data'])
 
 # inputs
-SEEDS_DIR = os.path.join(DATA_DIR, 'seeds')
-CSV_FILENAMES = ['dataset_info.csv', 'catalog.csv']
+SEEDS_DIR = os.path.join(THIS_PROJECT, config['seeds_dir'])
+CSV_FILENAMES = config['csvs_filenames']
 
 # outputs
-JSON_DIR = os.path.join(DATA_DIR, 'json')
+JSON_DIR = os.path.join(THIS_PROJECT, config['json_dir'])
 os.makedirs(JSON_DIR, exist_ok=True)
 
 # catalog and dataset info to json

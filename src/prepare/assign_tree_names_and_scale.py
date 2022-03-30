@@ -7,6 +7,14 @@ Created on Mon Mar 28 13:16:36 2022
 import os
 import pathlib
 import pandas as pd
+import json
+
+
+def read_json(json_path):
+    f = open(json_path)
+    data = json.load(f)
+    f.close()
+    return data
 
 
 def dap_from_height(HT, hmax=45):
@@ -19,19 +27,19 @@ def dap_from_height(HT, hmax=45):
 
 # directories relatives to project root path
 THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
-PROJECT_ROOT = str(pathlib.Path(THIS_PATH.split('src')[0]))
-DATA_DIR = os.path.join(PROJECT_ROOT, 'data')
+THIS_PROJECT = str(pathlib.Path(THIS_PATH.split('src')[0]))
+config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
 
 # inputs
-DATASET_INFO_PATH = os.path.join(DATA_DIR, 'dataset_info.csv')
-CATALOG_PATH = os.path.join(DATA_DIR, 'catalog.csv')
+DATASET_INFO_PATH = os.path.join(THIS_PROJECT, config['dataset_info'])
+CATALOG_PATH = os.path.join(THIS_PROJECT, config['catalog'])
 
 # output
-SEEDS_DIR = os.path.join(DATA_DIR, 'seeds')
+SEEDS_DIR = os.path.join(THIS_PROJECT, config['seeds_dir'])
 
 # params
-hmax = 45  # tree max h in meters
-sotobosque_th = 2.5  # below this th in meters are small trees
+hmax = config['hmax']  # tree max h in meters
+sotobosque_th = config['sotobosque_th']  # below this th in meters are small trees
 
 df_info = pd.read_csv(DATASET_INFO_PATH)
 df_catalog = pd.read_csv(CATALOG_PATH)

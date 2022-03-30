@@ -77,10 +77,11 @@ THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
 PROJECT_ROOT = str(pathlib.Path(THIS_PATH.split(PROJECT_NAME)[0]))
 PROJECT_ROOT = os.path.join(PROJECT_ROOT, PROJECT_NAME)
 
-DATA_DIR = os.path.join(PROJECT_ROOT, 'data')
+config_path = os.path.join(PROJECT_ROOT, 'config.json')
+config = read_json(config_path)
 
-input_folder = os.path.join(DATA_DIR, 'json')
-output_folder = os.path.join(DATA_DIR, 'export', 'obj')
+input_folder = config['json_dir']
+output_folder = os.path.join(config['export_dir'], 'obj')
 
 os.makedirs(output_folder, exist_ok=True)
 

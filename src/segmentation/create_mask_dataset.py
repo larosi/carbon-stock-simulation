@@ -14,6 +14,14 @@ import numpy as np
 from skimage.transform import resize
 from tqdm import tqdm
 import rasterio
+import json
+
+
+def read_json(json_path):
+    f = open(json_path)
+    data = json.load(f)
+    f.close()
+    return data
 
 
 def save_raster(output_path, out_image, reference_path):
@@ -36,28 +44,29 @@ def save_raster(output_path, out_image, reference_path):
 
 
 THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
-PROJECT_ROOT = str(pathlib.Path(THIS_PATH.split('src')[0]))
-DATA_DIR = os.path.join(PROJECT_ROOT, 'data')
-EXPORT_DIR = os.path.join(DATA_DIR, 'export')
+THIS_PROJECT  = str(pathlib.Path(THIS_PATH.split('src')[0]))
+config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
+
+DATA_DIR = os.path.join(PROJECT_ROOT, config['data_dir'])
+EXPORT_DIR = os.path.join(PROJECT_ROOT, config['export_dir'])
 
 # input folders
-CARBON_STOCK_PROJECT = os.path.join(PROJECT_ROOT, '..', 'carbon-stock')
-CHM_DIR = os.path.join(CARBON_STOCK_PROJECT, 'data', 'raw', 'laz', 'chm')
+CHM_DIR = os.path.join(THIS_PROJECT, config['input_chm_dir'])
 
 MASK_DIR = os.path.join(EXPORT_DIR, 'trees_mask')
-SEEDS_DIR = os.path.join(DATA_DIR, 'seeds')
+SEEDS_DIR = os.path.join(THIS_PROJECT, 'seeds')
 
 # output_folder
 CHM_MASK_DIR = os.path.join(EXPORT_DIR, 'chm_mask')
 os.makedirs(CHM_MASK_DIR, exist_ok=True)
 
-CATALOG_PATH = os.path.join(DATA_DIR, 'catalog.csv')
-DATASET_INFO_PATH = os.path.join(DATA_DIR, 'dataset_info.csv')
+CATALOG_PATH = os.path.join(THIS_PROJECT, config['catalog'])
+DATASET_INFO_PATH = os.path.join(THIS_PROJECT, config['dataset_info'])
 df_catalog = pd.read_csv(CATALOG_PATH)
 df_info = pd.read_csv(DATASET_INFO_PATH)
 
-chm_resolution = 0.12
-mask_resolution = 0.01
+chm_resolution = config['resolution']
+mask_resolution = config['tree_mask_resolution']
 
 """ load tree masks """
 tree_masks = {}

@@ -8,9 +8,21 @@ Created on Fri Jan  7 19:40:45 2022
 import pandas as pd
 import os
 from skimage import io
+import json
 
-chm_folder = r'C:\Users\Mico\Desktop\gitlab\carbon-stock\data\raw\laz\chm'
 
+def read_json(json_path):
+    f = open(json_path)
+    data = json.load(f)
+    f.close()
+    return data
+
+
+THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
+THIS_PROJECT = str(pathlib.Path(THIS_PATH.split('src')[0]))
+config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
+chm_folder = os.path.join(THIS_PROJECT, config['input_chm_dir'])
+dataset_info_path = os.path.join(THIS_PROJECT, ['dataset_info'])
 chm_filenames = os.listdir(chm_folder)
 
 xtotal = []
@@ -33,4 +45,4 @@ df['filename'] = pd.Series(csv_filenames)
 df['xtotal'] = pd.Series(xtotal)
 df['ytotal'] = pd.Series(ytotal)
 
-df.to_csv(r'data/dataset_info.csv', index = False)
+df.to_csv(dataset_info_path, index = False)

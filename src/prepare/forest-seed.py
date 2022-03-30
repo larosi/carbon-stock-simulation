@@ -14,15 +14,14 @@ from skimage.transform import rescale
 import plotly.express as px
 import pandas as pd
 import pathlib
+import json
 
 
-# https://www.conaf.cl/wp-content/files_mf/1381956486Informeroble.pdf
-def dap_from_height(HT, hmax=45):
-    """ compute dap using inverse alometrics functions """
-    HT = np.clip(HT*0.8, 0, hmax)  # limit to avoid too big diameters
-    DAP = 0.794063/(1/HT - 0.0217326)  # roble
-
-    return DAP
+def read_json(json_path):
+    f = open(json_path)
+    data = json.load(f)
+    f.close()
+    return data
 
 
 def find_peaks(image, min_distance=14):
@@ -32,15 +31,17 @@ def find_peaks(image, min_distance=14):
 
 # directories relatives to project root path
 THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
-PROJECT_ROOT = str(pathlib.Path(THIS_PATH.split('src')[0]))
-DATA_DIR = os.path.join(PROJECT_ROOT, 'data')
+THIS_PROJECT = str(pathlib.Path(THIS_PATH.split('src')[0]))
+config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
+
+DATA_DIR = os.path.join(THIS_PROJECT, config['data_dir'])
 
 # inputs
-chm_folder = os.path.join(PROJECT_ROOT, r'..\carbon-stock\data\raw\laz\chm')
-dataset_info_path = os.path.join(DATA_DIR, 'dataset_info.csv')
+chm_folder = os.path.join(THIS_PROJECT, config['input_chm_dir'])
+dataset_info_path = os.path.join(THIS_PROJECT, config['dataset_info'])
 
 # outputs
-SEEDS_DIR = os.path.join(DATA_DIR, 'seeds')
+SEEDS_DIR = os.path.join(THIS_PROJECT, config['seeds_dir'])
 PLOTS_DIR = os.path.join(DATA_DIR, 'plots')
 
 os.makedirs(SEEDS_DIR, exist_ok=True)
@@ -81,11 +82,9 @@ for chm_base_filename in tqdm(chm_filenames):
 
     seed_coords = np.concatenate(seed_coords)
     seed_h = np.concatenate(seed_h)
-    seed_dap = dap_from_height(seed_h)
 
     df = pd.DataFrame()
     df['height'] = pd.Series(seed_h)
-    df['dap'] = pd.Series(seed_dap)
     df['x'] = pd.Series(seed_coords[:, 1])
     df['y'] = pd.Series(seed_coords[:, 0])
 

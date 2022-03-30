@@ -12,6 +12,8 @@ import numpy as np
 from tqdm import tqdm
 import pathlib
 from skimage import io
+import random
+import json
 
 
 """ https://gdal.org/tutorials/geotransforms_tut.html 
@@ -77,13 +79,19 @@ def compute_chm(x, y, z, resolution):
 
     return raster_im, raster_bounds, geotransform
 
-ref_raster = gdal.Open(r'C:\Users\Mico\Desktop\gitlab\carbon-stock\data\raw\laz\chm\640_5600_3_norm_normalizado_CHM-20210121_S1_ENTREGA_04_LIDAR_CORREGIDO-03_CHM-02_PRODUCTOS_TILE-02_OPTECH-00_PRD-CHILE-2021-lidar-raw.tif')
-projection = ref_raster.GetProjection()
-del ref_raster
+
+def read_json(json_path):
+    f = open(json_path)
+    data = json.load(f)
+    f.close()
+    return data
+
 
 THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
 THIS_PROJECT = str(pathlib.Path(THIS_PATH.split('src')[0]))
-DATA_EXPORT_DIR = os.path.join(THIS_PROJECT, 'data', 'export')
+config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
+
+DATA_EXPORT_DIR = os.path.join(THIS_PROJECT, config['export_dir'])
 
 INPUT = os.path.join(DATA_EXPORT_DIR, 'las')
 OUTPUT = os.path.join(DATA_EXPORT_DIR, 'chm')
@@ -92,8 +100,16 @@ OUTPUT_BOUNDS = os.path.join(DATA_EXPORT_DIR, 'bounds')
 os.makedirs(OUTPUT, exist_ok=True)
 os.makedirs(OUTPUT_BOUNDS, exist_ok=True)
 
-color_th = 0.25
-resolution = 0.12
+""" load a random CHM raster to use projection as reference """
+chm_dir = os.path.join(THIS_PROJECT, config['input_chm_dir'])
+chm_ref_filename = random.choice(os.listdir(chm_dir))
+chm_ref_path  = os.path.join(chm_dir, chm_ref_filename)
+ref_raster = gdal.Open(chm_ref_path)
+projection = ref_raster.GetProjection()
+del ref_raster
+
+color_th = config['color_th']
+resolution = config['resolution']
 nodata = 0
 
 laz_filenames = os.listdir(INPUT)
@@ -110,6 +126,7 @@ for laz_filename in laz_filenames:
         color = np.mean(color, axis=1)
         color = color/color.max()
         color = color > color_th
+        # descatar puntos con color muy oscuro
         x, y, z = infile.x[color], infile.y[color], infile.z[color]
         infile.close()
         del color

@@ -14,16 +14,25 @@ from skimage import io
 from skimage import morphology as morph
 from skimage.util import img_as_ubyte
 from scipy.ndimage import binary_fill_holes
+import json
+
+
+def read_json(json_path):
+    f = open(json_path)
+    data = json.load(f)
+    f.close()
+    return data
 
 
 THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
-PROJECT_ROOT = str(pathlib.Path(THIS_PATH.split('src')[0]))
-DATA_DIR = os.path.join(PROJECT_ROOT, 'data')
-EXPORT_DIR = os.path.join(DATA_DIR, 'export')
+THIS_PROJECT  = str(pathlib.Path(THIS_PATH.split('src')[0]))
+config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
+DATA_DIR = os.path.join(THIS_PROJECT, config['data_dir'])
+EXPORT_DIR = os.path.join(THIS_PROJECT, config['export_dir'])
 
 # input folders
 LAS_DIR = os.path.join(EXPORT_DIR, 'trees_las')
-CATALOG_PATH = os.path.join(DATA_DIR, 'catalog.csv')
+CATALOG_PATH = os.path.join(THIS_PROJECT, config['catalog'])
 
 # output folders
 OUTPUT_DIR = os.path.join(EXPORT_DIR, 'trees_mask')
@@ -32,7 +41,8 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 df = pd.read_csv(CATALOG_PATH)
 
 tree_names = df['name'].values
-resolution = 0.01  # pixel in meters
+resolution = config['tree_mask_resolution']  # pixel in meters
+color_th = config['color_th']
 for index, row in df.iterrows():
     tree_name = row['name']
     tree_h = row['height']
@@ -72,7 +82,7 @@ for index, row in df.iterrows():
     n_points = len(y)
     im = np.zeros((n_rows, n_columns))
     for i in range(n_points):
-        if gray[i] > 0.25:
+        if gray[i] > color_th:
             im[xi[i], yi[i]] = gray[i]
 
     """ obtener mascara binaria de la imagen """

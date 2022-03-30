@@ -39,9 +39,10 @@ PROJECT_NAME = 'carbon-stock-simulation'
 THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
 THIS_PROJECT = str(pathlib.Path(THIS_PATH.split(PROJECT_NAME)[0]))
 THIS_PROJECT = os.path.join(THIS_PROJECT, PROJECT_NAME)
+config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
 
-DATA_DIR = os.path.join(THIS_PROJECT, 'data', 'json')
-OUTPUT_DIR = os.path.join(THIS_PROJECT, 'data', 'export', 'trees_obj')
+DATA_DIR = os.path.join(THIS_PROJECT, config['json_dir'])
+OUTPUT_DIR = os.path.join(THIS_PROJECT, config['export_dir'], 'trees_obj')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 catalog_low_path = os.path.join(DATA_DIR, 'catalog_low.json')
