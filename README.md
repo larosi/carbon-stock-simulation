@@ -31,6 +31,9 @@ python src/postprocessing/chm_clone_geometadata.py
 # pasar cada asset de arbol a .obj
 blender <path al repo>/data/main.blend --background --python <path al repo>/src/segmentation/save_each_tree_as_obj.py
 
+# pasar arboles .obj a LiDAR .las (editar los paths del script antes)
+*python src/postprocessing/cloudcompare_obj2las.py
+
 # pasar cada asset de arbol a .obj
 *python src/segmentation/create_mask_from_each_las_tree.py
 
