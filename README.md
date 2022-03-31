@@ -17,7 +17,7 @@ python src/prepare/assign_tree_names_and_scale.py
 python src/prepare/csv_to_json.py
 
 # generar un bosque 3D .obj a partir de un seeds/*.csv
-python src/generate/blender-generate-dataset.py
+blender <path al repo>/data/main.blend --background --python <path al repo>/src/generate/blender-generate-dataset.py
 
 # pasar de .obj a LiDAR .las
 python src/postprocessing/cloudcompare_obj2las.py
@@ -29,7 +29,7 @@ python src/postprocessing/lidar2chm_laspy.py
 python src/postprocessing/chm_clone_geometadata.py
 
 # pasar cada asset de arbol a .obj
-*python src/segmentation/save_each_tree_as_obj.py
+blender data/main.blend --background --python src/segmentation/save_each_tree_as_obj.py
 
 # pasar cada asset de arbol a .obj
 *python src/segmentation/create_mask_from_each_las_tree.py
@@ -87,6 +87,10 @@ python src/prepare/csv_to_json.py
 ## Generar Bosque 3D
 Abrir el archivo **data/main.blend** con blender, luego abrir y ejecutar el script **src/generate/blender-generate-dataset.py** esto generará un .obj y .mtl en **data/export/obj/**, este script también genera un flag *.txt* para evitar generar un mismo bosque dos veces en caso de que se quiera ejecutar varios script en paralelo.
 
+```bash
+blender <path al repo>/data/main.blend --background --python <path al repo>/src/generate/blender-generate-dataset.py
+```
+
 ![Blender Forest 3D](./docs/blender_forest.jpg?raw=true "Blender Forest 3D")
 
 ## OBJ2LAS
@@ -111,12 +115,12 @@ python src/postprocessing/chm_clone_geometadata.py
 
 # Generar mapa de segmentación
 
-![Tree instance segmentation](./docs/segm_zoom_in_out.gif?raw=true "Tree instance segmentation")
-
 ## Generar .obj de cada árbol
-Abrir el archivo **data/main.blend** con blender, luego abrir y ejecutar el script **src/segmentation/save_each_tree_as_obj.py** esto generará un .obj y .mtl por cada árbol en **data/export/trees_obj/**
+Abrir el archivo **data/main.blend** con blender, luego abrir y ejecutar el script **src/segmentation/save_each_tree_as_obj.py** esto generará un .obj y .mtl por cada árbol en **data/export/trees_obj/**.
+
+También se puede ejecutar por linea de comandos usando los paths absolutos de main.blend y el script.py
 ```bash
-python src/segmentation/save_each_tree_as_obj.py
+blender <path al repo>/data/main.blend --background --python <path al repo>/src/segmentation/save_each_tree_as_obj.py
 ```
 
 ## Generar .las de cada árbol
@@ -130,9 +134,12 @@ Para cada cada árbol de **data/export/trees_las/** genera una máscara binaria 
 ```bash
 python src/segmentation/create_mask_from_each_las_tree.py
 ```
+![Tree mask from projection](./docs/tre_z_projection.png?raw=true "Tree mask from projection")
+
 
 ## generar mapa de segmentación para cada CHM generado
 Usando un raster CHM de referencia dibuja una máscara para cada árbol, según el nombre de árbol asignado y su escala. Las máscaras de agregan siguiendo el [algoritmo del pintor](https://es.wikipedia.org/wiki/Algoritmo_del_pintor), es decir se pintan en orden de menor a mayor altura, de manera tal que los árboles más grandes tapan a los demás. Las máscaras generadas se guardan en **data/export/chm_mask**
 ```bash
 python src/segmentation/create_mask_dataset.py
 ```
+![Tree instance segmentation](./docs/segm_zoom_in_out.gif?raw=true "Tree instance segmentation")

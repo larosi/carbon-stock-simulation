@@ -31,7 +31,7 @@ def csvs_to_json(filenames, input_dir, output_dir):
 THIS_PATH = str(pathlib.Path(__file__).parent.absolute())
 THIS_PROJECT = str(pathlib.Path(THIS_PATH.split('src')[0]))
 config = read_json(os.path.join(THIS_PROJECT, 'config.json'))
-DATA_DIR = os.path.join(THIS_PROJECT, config['data'])
+DATA_DIR = os.path.join(THIS_PROJECT, config['data_dir'])
 
 # inputs
 SEEDS_DIR = os.path.join(THIS_PROJECT, config['seeds_dir'])

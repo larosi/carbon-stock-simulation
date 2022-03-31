@@ -45,13 +45,11 @@ DATA_DIR = os.path.join(THIS_PROJECT, config['json_dir'])
 OUTPUT_DIR = os.path.join(THIS_PROJECT, config['export_dir'], 'trees_obj')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-catalog_low_path = os.path.join(DATA_DIR, 'catalog_low.json')
-catalog_mid_path = os.path.join(DATA_DIR, 'catalog_mid.json')
+catalog_path = os.path.join(DATA_DIR, 'catalog.json')
 
-df_low = read_json(catalog_low_path)
-df_mid = read_json(catalog_mid_path)
+df = read_json(catalog_path)
 
-tree_names = list(df_low['name'].values()) + list(df_mid['name'].values())
+tree_names = df['name'].values()
 
 for tree_name in tree_names:
     # deselect all objs in the scene
