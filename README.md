@@ -29,7 +29,7 @@ python src/postprocessing/lidar2chm_laspy.py
 python src/postprocessing/chm_clone_geometadata.py
 
 # pasar cada asset de arbol a .obj
-blender data/main.blend --background --python src/segmentation/save_each_tree_as_obj.py
+blender <path al repo>/data/main.blend --background --python <path al repo>/src/segmentation/save_each_tree_as_obj.py
 
 # pasar cada asset de arbol a .obj
 *python src/segmentation/create_mask_from_each_las_tree.py
